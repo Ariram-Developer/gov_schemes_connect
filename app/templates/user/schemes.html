@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i data-lucide="shield-check" style="width: 24px; height: 24px; color: var(--primary); margin-right: 10px;"></i>
+            <span>CITIZEN PORTAL</span>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">SERVICES</div>
+            <a href="{{ url_for('user.schemes') }}" class="nav-item active">
+                <i data-lucide="grid"></i>
+                Available Schemes
+            </a>
+            <a href="{{ url_for('user.track') }}" class="nav-item">
+                <i data-lucide="file-text"></i>
+                Track Applications
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+                <i data-lucide="log-out"></i>
+                Secure Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        
+        <header class="top-header">
+            <button id="mobile-menu-btn" class="mobile-menu-btn">
+                <i data-lucide="menu"></i>
+            </button>
+            <div class="header-title">Thunai - Citizen Portal</div>
+            
+            <div class="header-profile">
+                <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Dark Mode">
+                    <i data-lucide="moon"></i>
+                </button>
+                
+                <div class="profile-text">
+                    <div class="profile-name">Hello, {{ session.get('full_name').split()[0] }}</div>
+                    <div class="profile-role">Citizen</div>
+                </div>
+                <div class="avatar">{{ session.get('full_name')[0] | upper }}</div>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+            
+            <div class="schemes-header-area">
+                <h2 style="margin-bottom: 15px; font-weight: 700;">
+                    Available Government Schemes ({{ schemes|length }})
+                </h2>
+                
+                <div class="category-filters" id="category-filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    
+                    {% set categories = [] %}
+                    {% for scheme in schemes %}
+                        {% if scheme.category not in categories %}
+                            {% set _ = categories.append(scheme.category) %}
+                            <button class="filter-btn" data-filter="{{ scheme.category }}">{{ scheme.category }}</button>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="schemes-grid">
+                {% if schemes %}
+                    {% for scheme in schemes %}
+                    <div class="scheme-card" data-category="{{ scheme.category }}">
+                        <div class="scheme-header">
+                            <span class="scheme-category">{{ scheme.category }}</span>
+                            <h3 class="scheme-title">{{ scheme.title }}</h3>
+                        </div>
+                        
+                        <div class="scheme-body">
+                            <p class="scheme-desc">{{ scheme.description }}</p>
+                            <div class="scheme-criteria">
+                                <strong>Eligibility:</strong> {{ scheme.eligibility_criteria }}
+                            </div>
+                            <div class="scheme-docs">
+                                <strong>Required Docs:</strong> {{ scheme.required_documents }}
+                            </div>
+                        </div>
+                        
+                        <div class="scheme-footer">
+                            <button class="apply-btn" onclick="alert('Application form coming next!')">Apply Now</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="color: var(--text-muted);">No schemes are currently available. Please check back later.</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const schemeCards = document.querySelectorAll('.scheme-card');
+        
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 1. Shift the active styling to the clicked button
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // 2. Get the category to filter by
+                const filterValue = btn.getAttribute('data-filter');
+                
+                // 3. Loop through cards and show/hide instantly
+                schemeCards.forEach(card => {
+                    if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+                        card.style.display = 'flex'; 
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // --- Mobile Sidebar Toggle Logic ---
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.querySelector('.sidebar');
+
+        if(menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+            });
+        }
+        
+        // Close sidebar if clicking outside of it on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+    });
+</script>
+{% endblock %}

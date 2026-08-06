@@ -1,12 +1,23 @@
 {% extends 'base.html' %}
 
 {% block auth_content %}
-<div class="auth-card">
-    <div class="auth-header">
-        <i data-lucide="shield-check" style="width: 48px; height: 48px; color: #1D4ED8; margin: 0 auto;"></i>
-        <h2>{% if is_register %}Citizen Registration{% else %}Secure Login{% endif %}</h2>
-        <p>Smart Government Schemes Connect</p>
-    </div>
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        
+        <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Dark Mode" style="position: absolute; top: 20px; right: 20px; background: var(--bg-color); box-shadow: 0 2px 10px rgba(0,0,0,0.1); border: 1px solid var(--border); margin: 0;">
+            <i data-lucide="moon"></i>
+        </button>
+
+        <div class="auth-header">
+            <i data-lucide="shield-check" style="width: 48px; height: 48px; color: var(--primary);"></i>
+            {% if is_register %}
+                <h2>Citizen Registration</h2>
+            {% else %}
+                <h2>Secure Login</h2>
+            {% endif %}
+            <p>Thunai - Government Schemes</p>
+        </div>
 
     <div class="flash-container">
         {% with messages = get_flashed_messages(with_categories=true) %}

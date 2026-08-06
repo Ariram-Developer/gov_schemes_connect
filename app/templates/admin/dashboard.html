@@ -44,7 +44,7 @@
             <button id="mobile-menu-btn" class="mobile-menu-btn">
                 <i data-lucide="menu"></i>
             </button>
-            <div class="header-title">Smart Government Schemes Connect</div>
+            <div class="header-title">Thunai - Admin Workspace</div>
             
             <div class="header-profile">
                 <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Dark Mode">
@@ -70,6 +70,8 @@
                     {% endif %}
                 {% endwith %}
             </div>
+
+            <img src="{{ url_for('static', filename='images/banner.png') }}" alt="System Overview Banner" class="dashboard-image-banner" onerror="this.style.display='none'">
 
             <h2 style="margin-bottom: 20px; font-weight: 700;">Platform Overview</h2>
             

@@ -29,11 +29,10 @@
             const savedTheme = localStorage.getItem('app-theme') || 'light';
             htmlEl.setAttribute('data-theme', savedTheme);
             
-            // 2. Set initial icon
             if (themeBtn) {
-                const icon = themeBtn.querySelector('i');
-                icon.setAttribute('data-lucide', savedTheme === 'dark' ? 'sun' : 'moon');
-                lucide.createIcons(); // Refresh the icon render
+                // 2. Safely set initial icon by injecting a fresh tag
+                themeBtn.innerHTML = `<i data-lucide="${savedTheme === 'dark' ? 'sun' : 'moon'}"></i>`;
+                lucide.createIcons(); 
                 
                 // 3. Listen for toggle clicks
                 themeBtn.addEventListener('click', () => {
@@ -43,7 +42,8 @@
                     htmlEl.setAttribute('data-theme', newTheme);
                     localStorage.setItem('app-theme', newTheme);
                     
-                    icon.setAttribute('data-lucide', newTheme === 'dark' ? 'sun' : 'moon');
+                    // Safely swap icon by injecting a fresh tag again
+                    themeBtn.innerHTML = `<i data-lucide="${newTheme === 'dark' ? 'sun' : 'moon'}"></i>`;
                     lucide.createIcons();
                 });
             }

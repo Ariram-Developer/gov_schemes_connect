@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i data-lucide="shield-check" style="width: 24px; height: 24px; color: var(--primary); margin-right: 10px;"></i>
+            <span>THUNAI</span>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">SERVICES</div>
+            <a href="{{ url_for('user.schemes') }}" class="nav-item">
+                <i data-lucide="grid"></i>
+                Available Schemes
+            </a>
+            <a href="{{ url_for('user.track') }}" class="nav-item active">
+                <i data-lucide="file-text"></i>
+                Track Applications
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+                <i data-lucide="log-out"></i>
+                Secure Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        
+        <header class="top-header">
+            <button id="mobile-menu-btn" class="mobile-menu-btn">
+                <i data-lucide="menu"></i>
+            </button>
+            <div class="header-title">Thunai - Citizen Portal</div>
+            
+            <div class="header-profile">
+                <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Dark Mode">
+                    <i data-lucide="moon"></i>
+                </button>
+                
+                <div class="profile-text">
+                    <div class="profile-name">Hello, {{ session.get('full_name').split()[0] }}</div>
+                    <div class="profile-role">Citizen</div>
+                </div>
+                <div class="avatar">{{ session.get('full_name')[0] | upper }}</div>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+            
+            <h2 style="margin-bottom: 25px; font-weight: 700;">My Applications</h2>
+
+            <div class="data-card">
+                <div class="data-header">
+                    <h3>Application History</h3>
+                </div>
+                
+                <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>App ID</th>
+                                <th>Scheme Name</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Remarks / Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if applications %}
+                                {% for app in applications %}
+                                <tr>
+                                    <td><strong>APP-{{ app.id }}</strong></td>
+                                    <td style="font-weight: 500;">{{ app.scheme_title }}</td>
+                                    <td>
+                                        <span class="scheme-category" style="margin-bottom: 0; padding: 2px 8px; font-size: 10px;">
+                                            {{ app.category }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if app.status == 'Pending' %}
+                                            <span class="pill pending">Pending</span>
+                                        {% elif app.status == 'Accepted' %}
+                                            <span class="pill accepted">Accepted</span>
+                                        {% elif app.status == 'Rejected' %}
+                                            <span class="pill rejected">Rejected</span>
+                                        {% else %}
+                                            <span class="pill">{{ app.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if app.status == 'Rejected' and app.rejection_reason %}
+                                            <span style="color: #ef4444; font-size: 13px; font-weight: 500;">
+                                                <i data-lucide="alert-circle" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i>
+                                                {{ app.rejection_reason }}
+                                            </span>
+                                        {% elif app.status == 'Pending' %}
+                                            <span style="color: var(--text-muted); font-size: 13px;">Under Admin Review</span>
+                                        {% elif app.status == 'Accepted' %}
+                                            <span style="color: #10b981; font-size: 13px; font-weight: 500;">
+                                                <i data-lucide="check-circle" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i>
+                                                Approved Successfully
+                                            </span>
+                                        {% else %}
+                                            <span style="color: var(--text-muted); font-size: 13px;">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                                        <i data-lucide="folder-open" style="width: 32px; height: 32px; opacity: 0.5; margin-bottom: 10px;"></i>
+                                        <br>
+                                        You have not submitted any applications yet.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.querySelector('.sidebar');
+
+        if(menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+            });
+        }
+        
+        // Close sidebar if clicking outside of it on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+    });
+</script>
+{% endblock %}
