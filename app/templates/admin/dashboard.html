@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i data-lucide="shield-check" style="margin-right: 10px; color: #60a5fa;"></i> Admin Module
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="nav-item {% if not current_filter %}active{% endif %}">
+                <i data-lucide="layout-dashboard"></i> Dashboard
+            </a>
+            <a href="{{ url_for('admin.placeholder', module_name='manage_users') }}" class="nav-item">
+                <i data-lucide="users"></i> Manage Users
+            </a>
+            <a href="{{ url_for('admin.placeholder', module_name='manage_schemes') }}" class="nav-item">
+                <i data-lucide="file-text"></i> Manage Schemes
+            </a>
+            
+            <div class="nav-section-title">Applications</div>
+            <a href="{{ url_for('admin.dashboard') }}" class="nav-item">
+                <div style="width: 6px; height: 6px; border-radius: 50%; background: #94a3b8; margin-right: 15px; margin-left: 5px;"></div> All Applications
+            </a>
+            <a href="{{ url_for('admin.dashboard', status='Pending') }}" class="nav-item {% if current_filter == 'Pending' %}active{% endif %}">
+                <div style="width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; margin-right: 15px; margin-left: 5px;"></div> Under Review
+            </a>
+            <a href="{{ url_for('admin.dashboard', status='Accepted') }}" class="nav-item {% if current_filter == 'Accepted' %}active{% endif %}">
+                <div style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; margin-right: 15px; margin-left: 5px;"></div> Approved
+            </a>
+            <a href="{{ url_for('admin.dashboard', status='Rejected') }}" class="nav-item {% if current_filter == 'Rejected' %}active{% endif %}">
+                <div style="width: 6px; height: 6px; border-radius: 50%; background: #ef4444; margin-right: 15px; margin-left: 5px;"></div> Rejected
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="nav-item" style="color: #ef4444;">
+                <i data-lucide="log-out"></i> Secure Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-header">
+            <button id="mobile-menu-btn" class="mobile-menu-btn">
+                <i data-lucide="menu"></i>
+            </button>
+            <div class="header-title">Smart Government Schemes Connect</div>
+            
+            <div class="header-profile">
+                <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Dark Mode">
+                    <i data-lucide="moon"></i>
+                </button>
+                
+                <div class="profile-text">
+                    <div class="profile-name">Hello, {{ session.get('full_name').split()[0] }}</div>
+                    <div class="profile-role">Administrator</div>
+                </div>
+                <div class="avatar">{{ session.get('full_name')[0] | upper }}</div>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+            
+            <div class="flash-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <h2 style="margin-bottom: 20px; font-weight: 700;">Platform Overview</h2>
+            
+            <div class="metrics-grid">
+                <div class="metric-card blue">
+                    <div class="icon-wrapper"><i data-lucide="users"></i></div>
+                    <div class="metric-value">{{ metrics.total_users }}</div>
+                    <div class="metric-label">Total Users</div>
+                </div>
+                <div class="metric-card blue">
+                    <div class="icon-wrapper"><i data-lucide="file-text"></i></div>
+                    <div class="metric-value">{{ metrics.total_schemes }}</div>
+                    <div class="metric-label">Active Schemes</div>
+                </div>
+                <div class="metric-card amber">
+                    <div class="icon-wrapper"><i data-lucide="clipboard-list"></i></div>
+                    <div class="metric-value">{{ metrics.pending_apps }}</div>
+                    <div class="metric-label">Applications Under Review</div>
+                </div>
+                <div class="metric-card green">
+                    <div class="icon-wrapper"><i data-lucide="check-circle"></i></div>
+                    <div class="metric-value">{{ metrics.approved_apps }}</div>
+                    <div class="metric-label">Applications Approved</div>
+                </div>
+                <div class="metric-card red">
+                    <div class="icon-wrapper"><i data-lucide="x-circle"></i></div>
+                    <div class="metric-value">{{ metrics.rejected_apps }}</div>
+                    <div class="metric-label">Applications Rejected</div>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="data-header">
+                    <h3>
+                        {% if current_filter %}{{ current_filter }} Applications{% else %}Recent Applications{% endif %}
+                    </h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Applicant Name</th>
+                            <th>Scheme Name</th>
+                            <th>Submitted On</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td style="font-weight: 600;">APP-{{ app.id }}</td>
+                            <td>{{ app.full_name }}</td>
+                            <td style="font-weight: 500;">{{ app.scheme_title }}</td>
+                            <td style="color: var(--text-muted);">{{ app.applied_at.strftime('%d %b %Y') }}</td>
+                            <td>
+                                <span class="pill {{ app.status | lower }}">{{ app.status }}</span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('admin.review_application', app_id=app.id) }}" class="btn-view">Review</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                                No applications found in this category.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.querySelector('.sidebar');
+
+        if(menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+            });
+        }
+        
+        // Close sidebar if clicking outside of it on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+    });
+</script>
+{% endblock %}

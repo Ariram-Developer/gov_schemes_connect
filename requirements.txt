@@ -1,0 +1,1 @@
+Flask3.0.0 mysql-connector-python8.2.0 python-dotenv1.0.0 Werkzeug3.0.1

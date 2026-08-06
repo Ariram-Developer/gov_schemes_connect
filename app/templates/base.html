@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gov Scheme Connect</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    {% if not session.get('user_id') %}
+        <div class="auth-wrapper">
+            {% block auth_content %}{% endblock %}
+        </div>
+    {% else %}
+        {% block content %}{% endblock %}
+    {% endif %}
+
+    <script>
+        lucide.createIcons();
+
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeBtn = document.getElementById('theme-toggle');
+            const htmlEl = document.documentElement;
+            
+            // 1. Check localStorage for saved theme, default to light
+            const savedTheme = localStorage.getItem('app-theme') || 'light';
+            htmlEl.setAttribute('data-theme', savedTheme);
+            
+            // 2. Set initial icon
+            if (themeBtn) {
+                const icon = themeBtn.querySelector('i');
+                icon.setAttribute('data-lucide', savedTheme === 'dark' ? 'sun' : 'moon');
+                lucide.createIcons(); // Refresh the icon render
+                
+                // 3. Listen for toggle clicks
+                themeBtn.addEventListener('click', () => {
+                    const currentTheme = htmlEl.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    
+                    htmlEl.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('app-theme', newTheme);
+                    
+                    icon.setAttribute('data-lucide', newTheme === 'dark' ? 'sun' : 'moon');
+                    lucide.createIcons();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

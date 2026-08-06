@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block auth_content %}
+<div class="auth-card">
+    <div class="auth-header">
+        <i data-lucide="shield-check" style="width: 48px; height: 48px; color: #1D4ED8; margin: 0 auto;"></i>
+        <h2>{% if is_register %}Citizen Registration{% else %}Secure Login{% endif %}</h2>
+        <p>Smart Government Schemes Connect</p>
+    </div>
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <form method="POST" action="{% if is_register %}{{ url_for('auth.register') }}{% else %}{{ url_for('auth.login') }}{% endif %}">
+        
+        {% if is_register %}
+        <div class="form-group">
+            <label for="full_name">Full Name</label>
+            <input type="text" id="full_name" name="full_name" class="form-control" placeholder="As per official IDs" required>
+        </div>
+        <div class="form-group">
+            <label for="phone_number">Phone Number</label>
+            <input type="tel" id="phone_number" name="phone_number" class="form-control" placeholder="Enter your 10-digit number" required>
+        </div>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Choose a username" required>
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        {% if is_register %}
+        <div class="form-group">
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="••••••••" required>
+        </div>
+        {% endif %}
+        
+        <button type="submit" class="btn">
+            {% if is_register %}Create Account{% else %}Sign In{% endif %}
+        </button>
+    </form>
+    
+    <div class="auth-footer">
+        {% if is_register %}
+            Already have an account? <a href="{{ url_for('auth.login') }}">Log in here</a>
+        {% else %}
+            New to the platform? <a href="{{ url_for('auth.register') }}">Create an account</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
