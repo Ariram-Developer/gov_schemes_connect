@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="landing-wrapper">
+    
+    <!-- Premium Public Navigation -->
+    <nav class="landing-nav">
+        <div class="nav-brand">
+            <i data-lucide="shield-check" style="color: var(--primary); width: 28px; height: 28px;"></i>
+            <span>THUNAI</span>
+        </div>
+        <div class="nav-actions">
+            <!-- Elite Interactive Theme Toggle -->
+            <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Dark Mode">
+                <i data-lucide="moon"></i>
+            </button>
+            <a href="{{ url_for('auth.login') }}" class="btn-ghost">Sign In</a>
+            <a href="{{ url_for('auth.register') }}" class="btn-primary">Create Account</a>
+        </div>
+    </nav>
+
+    <!-- 1. Cinematic Hero Section -->
+    <section class="hero-section">
+        <div class="glow-orb"></div>
+        <div class="hero-content reveal">
+            <div class="hero-badge">Securing the future of citizens</div>
+            <h1 class="hero-title">Your Bridge to<br><span style="color: var(--primary);">Government Support.</span></h1>
+            <p class="hero-subtitle">A frictionless, enterprise-grade portal to discover, apply, and track welfare schemes. Your data, heavily encrypted. Your benefits, highly accessible.</p>
+            
+            <div class="hero-cta">
+                <a href="{{ url_for('auth.register') }}" class="btn-primary" style="padding: 14px 28px; font-size: 16px;">Get Started Securely</a>
+                <a href="#features" class="btn-ghost" style="padding: 14px 28px; font-size: 16px;">Explore Platform</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. The Trust Anchor (Security Strip) -->
+    <section class="security-strip reveal">
+        <div class="security-item">
+            <i data-lucide="lock"></i>
+            <span>End-to-End Encryption</span>
+        </div>
+        <div class="security-divider"></div>
+        <div class="security-item">
+            <i data-lucide="database"></i>
+            <span>Verified State Data</span>
+        </div>
+        <div class="security-divider"></div>
+        <div class="security-item">
+            <i data-lucide="shield"></i>
+            <span>Strict Privacy Vault</span>
+        </div>
+    </section>
+
+    <!-- 3. The Bento Box Feature Grid -->
+    <section id="features" class="bento-section">
+        <div class="bento-header reveal">
+            <h2>Engineered for absolute clarity.</h2>
+            <p>We stripped away the bureaucracy to build a platform that just works.</p>
+        </div>
+        
+        <div class="bento-grid">
+            <!-- Card 1: Smart Discovery -->
+            <div class="bento-card card-large reveal">
+                <div class="bento-icon"><i data-lucide="search"></i></div>
+                <h3>Smart Discovery</h3>
+                <p>Our dynamic filtering engine instantly matches you with the exact healthcare, education, and housing schemes you are eligible for, eliminating hours of manual research.</p>
+            </div>
+            
+            <!-- Card 2: Frictionless UI -->
+            <div class="bento-card card-medium reveal" style="transition-delay: 0.1s;">
+                <div class="bento-icon"><i data-lucide="zap"></i></div>
+                <h3>Frictionless Applications</h3>
+                <p>No more confusing paperwork. Apply through a guided, multi-step asynchronous wizard with a drag-and-drop secure document vault.</p>
+            </div>
+            
+            <!-- Card 3: Live Tracking -->
+            <div class="bento-card card-medium reveal" style="transition-delay: 0.2s;">
+                <div class="bento-icon"><i data-lucide="activity"></i></div>
+                <h3>Live Tracking</h3>
+                <p>Stop guessing. Watch your application move from Pending to Approved in real-time on your personalized tracking ledger.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="landing-footer reveal">
+        <div class="nav-brand" style="justify-content: center; margin-bottom: 15px; opacity: 0.5; display: flex; align-items: center; gap: 10px;">
+            <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
+            <span style="font-size: 16px; font-weight: 800; letter-spacing: 1px;">THUNAI</span>
+        </div>
+        <p>&copy; 2026 Smart Government Schemes Connect. All rights securely reserved.</p>
+    </footer>
+
+</div>
+
+<!-- Fluid Scroll Animation Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        const revealElements = document.querySelectorAll('.reveal');
+        const observerOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
+        const scrollObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        revealElements.forEach(el => scrollObserver.observe(el));
+    });
+</script>
+{% endblock %}

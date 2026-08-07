@@ -9,17 +9,12 @@
 </head>
 <body>
 
-    {% if not session.get('user_id') %}
-        <div class="auth-wrapper">
-            {% block auth_content %}{% endblock %}
-        </div>
-    {% else %}
-        {% block content %}{% endblock %}
-    {% endif %}
+    <!-- Render both blocks unconditionally. The child templates dictate which one gets populated! -->
+    {% block content %}{% endblock %}
+    {% block auth_content %}{% endblock %}
 
     <script>
         lucide.createIcons();
-
         
         document.addEventListener('DOMContentLoaded', () => {
             const themeBtn = document.getElementById('theme-toggle');
