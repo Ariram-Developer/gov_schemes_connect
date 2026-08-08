@@ -58,6 +58,92 @@ def dashboard():
     
     return render_template('admin/dashboard.html', metrics=metrics, applications=recent_applications, current_filter=status_filter)
 
+
+@admin_bp.route('/users')
+@login_required
+def manage_users():
+    if session.get('role') != 'admin':
+        flash('Unauthorized access.', 'error')
+        return redirect(url_for('user.schemes'))
+        
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    
+    # 1. Real-Time Security Metrics
+    cursor.execute("SELECT COUNT(id) as count FROM users WHERE role = 'citizen' AND is_active = 1")
+    active_count = cursor.fetchone()['count']
+    
+    cursor.execute("SELECT COUNT(id) as count FROM users WHERE role = 'citizen' AND is_active = 0")
+    suspended_count = cursor.fetchone()['count']
+    
+    metrics = {
+        'active_users': active_count,
+        'suspended_users': suspended_count,
+        'total_users': active_count + suspended_count
+    }
+    
+    # Capture status selection from the URL argument (?status=All/Active/Suspended)
+    status_filter = request.args.get('status', 'All')
+    
+    # 2. Filtered Database Target Query
+    query = """
+        SELECT u.id, u.full_name, u.email, u.phone_number, u.created_at, u.is_active,
+               COUNT(a.id) as total_applications
+        FROM users u
+        LEFT JOIN applications a ON u.id = a.user_id
+        WHERE u.role = 'citizen'
+    """
+    
+    if status_filter == 'Active':
+        query += " AND u.is_active = 1"
+    elif status_filter == 'Suspended':
+        query += " AND u.is_active = 0"
+        
+    query += """
+        GROUP BY u.id
+        ORDER BY u.id DESC
+    """
+    
+    cursor.execute(query)
+    users = cursor.fetchall()
+    cursor.close()
+    
+    return render_template('admin/users_manage.html', users=users, metrics=metrics, current_filter=status_filter)
+
+
+@admin_bp.route('/users/<int:user_id>/toggle', methods=['POST'])
+@login_required
+def toggle_user_status(user_id):
+    if session.get('role') != 'admin':
+        flash('Unauthorized access.', 'error')
+        return redirect(url_for('user.schemes'))
+        
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    
+    try:
+        # Check current status to determine the action taken
+        cursor.execute("SELECT is_active FROM users WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
+        
+        if user:
+            new_status = 0 if user['is_active'] else 1
+            cursor.execute("UPDATE users SET is_active = %s WHERE id = %s", (new_status, user_id))
+            db.commit()
+            
+            action = "restored" if new_status == 1 else "suspended"
+            flash(f'Account access has been successfully {action}.', 'success')
+        else:
+            flash('User record not found.', 'error')
+            
+    except mysql.connector.Error as err:
+        flash('A database error occurred while updating the account.', 'error')
+    finally:
+        cursor.close()
+        
+    return redirect(url_for('admin.manage_users'))
+
+
 # Functional placeholder for modules we will build next
 @admin_bp.route('/module/<module_name>')
 @admin_required
@@ -80,6 +166,7 @@ def manage_schemes():
     schemes = cursor.fetchall()
     cursor.close()
     return render_template('admin/schemes_manage.html', schemes=schemes)
+
 
 @admin_bp.route('/schemes/new', methods=['GET', 'POST'])
 @login_required

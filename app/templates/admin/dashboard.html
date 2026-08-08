@@ -12,24 +12,24 @@
             <a href="{{ url_for('admin.dashboard') }}" class="nav-item active">
                 <i data-lucide="layout-dashboard"></i> Dashboard
             </a>
-            <a href="#" class="nav-item">
+            <a href="{{ url_for('admin.manage_users') }}" class="nav-item">
                 <i data-lucide="users"></i> Manage Users
             </a>
             <a href="{{ url_for('admin.manage_schemes') }}" class="nav-item">
                 <i data-lucide="folder-kanban"></i> Manage Schemes
             </a>
 
-            <div class="nav-section-title">QUICK FILTERS</div>
-            <a href="{{ url_for('admin.dashboard', status='All') }}#recent-table" class="nav-item {% if current_filter == 'All' %}active{% endif %}">
-                <span class="status-dot default-dot"></span> All Applications
+            <div class="nav-section-title top-spacer">APPLICATIONS</div>
+            <a href="{{ url_for('admin.dashboard', status='All') }}#recent-table" class="nav-item small-font">
+                <span class="status-dot all-apps-dot"></span> All Applications
             </a>
-            <a href="{{ url_for('admin.dashboard', status='Pending') }}#recent-table" class="nav-item {% if current_filter == 'Pending' %}active{% endif %}">
+            <a href="{{ url_for('admin.dashboard', status='Pending') }}#recent-table" class="nav-item small-font">
                 <span class="status-dot pending-dot"></span> Under Review
             </a>
-            <a href="{{ url_for('admin.dashboard', status='Approved') }}#recent-table" class="nav-item {% if current_filter == 'Approved' or current_filter == 'Accepted' %}active{% endif %}">
+            <a href="{{ url_for('admin.dashboard', status='Approved') }}#recent-table" class="nav-item small-font">
                 <span class="status-dot accepted-dot"></span> Approved
             </a>
-            <a href="{{ url_for('admin.dashboard', status='Rejected') }}#recent-table" class="nav-item {% if current_filter == 'Rejected' %}active{% endif %}">
+            <a href="{{ url_for('admin.dashboard', status='Rejected') }}#recent-table" class="nav-item small-font">
                 <span class="status-dot rejected-dot"></span> Rejected
             </a>
         </nav>

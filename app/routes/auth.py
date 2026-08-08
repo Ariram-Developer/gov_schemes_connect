@@ -15,22 +15,18 @@ def register():
         full_name = request.form['full_name'].strip()
         phone_number = request.form['phone_number'].strip()
         
-        # Validation 1: Passwords Match
         if password != confirm_password:
             flash('Passwords do not match. Please try again.', 'error')
             return redirect(url_for('auth.register'))
             
-        # Validation 2: Password Strength (8 chars, 1 uppercase, 1 lowercase, 1 number)
         if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$', password):
             flash('Password must be at least 8 characters and include uppercase, lowercase, and a number.', 'error')
             return redirect(url_for('auth.register'))
 
-        # Validation 3: Phone Number Format (10 digits, starts with 6, 7, 8, or 9)
         if not re.match(r'^[6-9]\d{9}$', phone_number):
             flash('Phone number must be exactly 10 digits and start with 6, 7, 8, or 9.', 'error')
             return redirect(url_for('auth.register'))
             
-        # Validation 4: Basic Email Format
         if not re.match(r'^[^@]+@[^@]+\.[^@]+$', email):
             flash('Please enter a valid email address.', 'error')
             return redirect(url_for('auth.register'))
@@ -38,14 +34,12 @@ def register():
         db = get_db()
         cursor = db.cursor(dictionary=True)
         
-        # Check if user exists
         cursor.execute("SELECT id FROM users WHERE email = %s OR username = %s", (email, username))
         if cursor.fetchone():
             flash('Email or Username already exists.', 'error')
             cursor.close()
             return redirect(url_for('auth.register'))
             
-        # Hash password and insert including phone_number
         hashed_pw = generate_password_hash(password)
         cursor.execute(
             "INSERT INTO users (username, email, password_hash, full_name, phone_number) VALUES (%s, %s, %s, %s, %s)",
@@ -72,6 +66,11 @@ def login():
         cursor.close()
         
         if user and check_password_hash(user['password_hash'], password):
+            # Enforce Account Suspension Security Layer
+            if user['role'] == 'citizen' and user.get('is_active') == 0:
+                flash('Your account has been suspended due to policy violations. Please contact administration.', 'error')
+                return redirect(url_for('auth.login'))
+
             session.clear()
             session['user_id'] = user['id']
             session['role'] = user['role']

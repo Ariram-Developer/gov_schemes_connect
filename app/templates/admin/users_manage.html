@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i data-lucide="shield-check" class="sidebar-icon"></i>
+            <span>ADMIN MODULE</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="nav-item">
+                <i data-lucide="layout-dashboard"></i> Dashboard
+            </a>
+            <a href="{{ url_for('admin.manage_users') }}" class="nav-item active">
+                <i data-lucide="users"></i> Manage Users
+            </a>
+            <a href="{{ url_for('admin.manage_schemes') }}" class="nav-item">
+                <i data-lucide="folder-kanban"></i> Manage Schemes
+            </a>
+
+            <div class="nav-section-title top-spacer">APPLICATIONS</div>
+            <a href="{{ url_for('admin.manage_applications', status='All') }}" class="nav-item small-font">
+                <span class="status-dot all-apps-dot"></span> All Applications
+            </a>
+            <a href="{{ url_for('admin.manage_applications', status='Pending') }}" class="nav-item small-font">
+                <span class="status-dot pending-dot"></span> Under Review
+            </a>
+            <a href="{{ url_for('admin.manage_applications', status='Approved') }}" class="nav-item small-font">
+                <span class="status-dot accepted-dot"></span> Approved
+            </a>
+            <a href="{{ url_for('admin.manage_applications', status='Rejected') }}" class="nav-item small-font">
+                <span class="status-dot rejected-dot"></span> Rejected
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+                <i data-lucide="log-out"></i> Secure Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-header">
+            <button id="mobile-menu-btn" class="mobile-menu-btn"><i data-lucide="menu"></i></button>
+            <div class="header-title">Citizen Directory</div>
+            
+            <div class="header-profile">
+                <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Dark Mode">
+                    <i data-lucide="moon"></i>
+                </button>
+                <div class="profile-text">
+                    <div class="profile-name">Admin Portal</div>
+                    <div class="profile-role">Administrator</div>
+                </div>
+                <div class="avatar">A</div>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+            
+            <div class="flash-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <div class="metrics-grid users-metrics-margin">
+                <div class="metric-card blue">
+                    <div class="icon-wrapper"><i data-lucide="users"></i></div>
+                    <div class="metric-value">{{ metrics.total_users }}</div>
+                    <div class="metric-label">Total Accounts</div>
+                </div>
+                <div class="metric-card green">
+                    <div class="icon-wrapper"><i data-lucide="shield-check"></i></div>
+                    <div class="metric-value">{{ metrics.active_users }}</div>
+                    <div class="metric-label">Active Citizens</div>
+                </div>
+                <div class="metric-card red">
+                    <div class="icon-wrapper"><i data-lucide="ban"></i></div>
+                    <div class="metric-value">{{ metrics.suspended_users }}</div>
+                    <div class="metric-label">Suspended Profiles</div>
+                </div>
+            </div>
+
+            <div class="flex-row-between dashboard-table-header" id="user-feed-section">
+                <h2 class="page-title no-margin">
+                    {% if current_filter == 'All' %}Global Roster Feed{% else %}{{ current_filter }} Accounts{% endif %}
+                </h2>
+                <div class="filter-category-group">
+                    <a href="{{ url_for('admin.manage_users', status='All') }}#user-feed-section" class="btn-category {% if current_filter == 'All' %}active-category{% endif %}">
+                        All
+                    </a>
+                    <a href="{{ url_for('admin.manage_users', status='Active') }}#user-feed-section" class="btn-category {% if current_filter == 'Active' %}active-category{% endif %}">
+                        Active
+                    </a>
+                    <a href="{{ url_for('admin.manage_users', status='Suspended') }}#user-feed-section" class="btn-category {% if current_filter == 'Suspended' %}active-category{% endif %}">
+                        Suspended
+                    </a>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Account ID</th>
+                                <th>Full Name</th>
+                                <th>Contact Channels</th>
+                                <th>Platform Usage</th>
+                                <th>Registered On</th>
+                                <th class="table-header-right">Security Control</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if users %}
+                                {% for user in users %}
+                                <tr class="{% if not user.is_active %}suspended-row{% endif %}">
+                                    <td class="font-bold">USR-{{ user.id }}</td>
+                                    <td>
+                                        {{ user.full_name }}
+                                        {% if not user.is_active %}
+                                            <span class="badge-suspended-inline">Suspended</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="user-email-text">{{ user.email }}</div>
+                                        <div class="user-phone-subtext">
+                                            <i data-lucide="phone" class="icon-xs"></i> {{ user.phone_number if user.phone_number else 'No Phone' }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if user.total_applications > 0 %}
+                                            <span class="pill accepted">{{ user.total_applications }} Applications</span>
+                                        {% else %}
+                                            <span class="pill pending">No Activity</span>
+                                        {% endif %}
+                                    </td>   
+                                    <td class="date-cell">
+                                        {{ user.created_at.strftime('%b %d, %Y') if user.created_at else 'N/A' }}
+                                    </td>
+                                    <td class="actions-cell">
+                                        <form method="POST" action="{{ url_for('admin.toggle_user_status', user_id=user.id) }}" class="inline-form">
+                                            {% if user.is_active %}
+                                                <button type="submit" class="btn-action btn-archive" onclick="return confirm('WARNING: Suspending this user will immediately revoke their login access to the platform. Proceed?');">
+                                                    <i data-lucide="ban" class="icon-sm"></i> Suspend
+                                                </button>
+                                            {% else %}
+                                                <button type="submit" class="btn-action btn-activate" onclick="return confirm('Restore this user\'s access to the platform?');">
+                                                    <i data-lucide="shield-check" class="icon-sm"></i> Activate
+                                                </button>
+                                            {% endif %}
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="empty-table-state">
+                                            <i data-lucide="users"></i>
+                                            <p>No {{ current_filter | lower }} citizen profiles found matching this category.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+{% endblock %}

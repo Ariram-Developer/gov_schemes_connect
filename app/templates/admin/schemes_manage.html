@@ -12,7 +12,7 @@
             <a href="{{ url_for('admin.dashboard') }}" class="nav-item">
                 <i data-lucide="layout-dashboard"></i> Dashboard
             </a>
-            <a href="#" class="nav-item">
+            <a href="{{ url_for('admin.manage_users') }}" class="nav-item">
                 <i data-lucide="users"></i> Manage Users
             </a>
             <a href="{{ url_for('admin.manage_schemes') }}" class="nav-item active">
@@ -112,7 +112,7 @@
                                 {% endfor %}
                             {% else %}
                                 <tr>
-                                    <td colspan="6">
+                                    <td colspan="5">
                                         <div class="empty-table-state">
                                             <i data-lucide="folder-open"></i>
                                             <p>No schemes found in the database.</p>

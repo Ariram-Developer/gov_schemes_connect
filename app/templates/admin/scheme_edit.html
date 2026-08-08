@@ -2,11 +2,47 @@
 
 {% block content %}
 <div class="dashboard-wrapper">
+    
     <aside class="sidebar">
-        </aside>
+        <div class="sidebar-header">
+            <i data-lucide="shield-check" class="sidebar-icon"></i>
+            <span>ADMIN MODULE</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="nav-item">
+                <i data-lucide="layout-dashboard"></i> Dashboard
+            </a>
+            <a href="{{ url_for('admin.manage_users') }}" class="nav-item">
+                <i data-lucide="users"></i> Manage Users
+            </a>
+            <a href="{{ url_for('admin.manage_schemes') }}" class="nav-item active">
+                <i data-lucide="folder-kanban"></i> Manage Schemes
+            </a>
+
+            <div class="nav-section-title top-spacer">APPLICATIONS</div>
+            <a href="{{ url_for('admin.manage_applications', status='All') }}" class="nav-item small-font">
+                <span class="status-dot all-apps-dot"></span> All Applications
+            </a>
+            <a href="{{ url_for('admin.manage_applications', status='Pending') }}" class="nav-item small-font">
+                <span class="status-dot pending-dot"></span> Under Review
+            </a>
+            <a href="{{ url_for('admin.manage_applications', status='Approved') }}" class="nav-item small-font">
+                <span class="status-dot accepted-dot"></span> Approved
+            </a>
+            <a href="{{ url_for('admin.manage_applications', status='Rejected') }}" class="nav-item small-font">
+                <span class="status-dot rejected-dot"></span> Rejected
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+                <i data-lucide="log-out"></i> Secure Logout
+            </a>
+        </div>
+    </aside>
 
     <main class="main-content">
         <header class="top-header">
+            <button id="mobile-menu-btn" class="mobile-menu-btn"><i data-lucide="menu"></i></button>
             <div class="header-title">Edit Government Scheme: #{{ scheme.id }}</div>
         </header>
 
