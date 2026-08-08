@@ -90,7 +90,7 @@
                         </div>
                         
                         <div class="scheme-footer">
-                            <button class="apply-btn" onclick="alert('Application form coming next!')">Apply Now</button>
+                            <a href="{{ url_for('user.apply', scheme_id=scheme.id) }}" class="apply-btn" style="display: block; text-align: center; text-decoration: none;">Apply Now</a>
                         </div>
                     </div>
                     {% endfor %}

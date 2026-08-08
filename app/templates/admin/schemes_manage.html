@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i data-lucide="shield-check" class="sidebar-icon"></i>
+            <span>ADMIN MODULE</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="nav-item">
+                <i data-lucide="layout-dashboard"></i> Dashboard
+            </a>
+            <a href="#" class="nav-item">
+                <i data-lucide="users"></i> Manage Users
+            </a>
+            <a href="{{ url_for('admin.manage_schemes') }}" class="nav-item active">
+                <i data-lucide="folder-kanban"></i> Manage Schemes
+            </a>
+
+            <div class="nav-section-title top-spacer">APPLICATIONS</div>
+            <a href="{{ url_for('admin.manage_applications', status='All') }}" class="nav-item small-font">
+                <span class="status-dot all-apps-dot"></span> All Applications
+            </a>
+            <a href="{{ url_for('admin.manage_applications', status='Pending') }}" class="nav-item small-font">
+                <span class="status-dot pending-dot"></span> Under Review
+            </a>
+            <a href="{{ url_for('admin.manage_applications', status='Approved') }}" class="nav-item small-font">
+                <span class="status-dot accepted-dot"></span> Approved
+            </a>
+            <a href="{{ url_for('admin.manage_applications', status='Rejected') }}" class="nav-item small-font">
+                <span class="status-dot rejected-dot"></span> Rejected
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+                <i data-lucide="log-out"></i> Secure Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-header">
+            <button id="mobile-menu-btn" class="mobile-menu-btn"><i data-lucide="menu"></i></button>
+            <div class="header-title">Manage Government Schemes</div>
+            
+            <div class="header-profile">
+                <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Dark Mode">
+                    <i data-lucide="moon"></i>
+                </button>
+                <div class="profile-text">
+                    <div class="profile-name">Admin Portal</div>
+                    <div class="profile-role">Administrator</div>
+                </div>
+                <div class="avatar">A</div>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+            
+            <div class="flash-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <div class="scheme-manage-header">
+                <h2 class="page-title scheme-manage-title">Active Schemes Roster</h2>
+                <a href="{{ url_for('admin.add_scheme') }}" class="btn-primary add-scheme-btn">
+                    <i data-lucide="plus" class="add-scheme-icon"></i> Add New Scheme
+                </a>
+            </div>
+
+            <div class="data-card">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Scheme Title</th>
+                                <th>Category</th>
+                                <th>Required Documents</th>
+                                <th>Date Added</th>
+                                <th class="table-header-right">Actions</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if schemes %}
+                                {% for scheme in schemes %}
+                                <tr>
+                                    <td>#{{ scheme.id }}</td>
+                                    <td class="scheme-title-cell">{{ scheme.title }}</td>
+                                    <td><span class="scheme-category scheme-category-badge">{{ scheme.category }}</span></td>
+                                    <td class="required-docs-text">{{ scheme.required_documents }}</td>
+                                    <td class="date-cell">{{ scheme.created_at.strftime('%b %d, %Y') if scheme.created_at else 'N/A' }}</td>                                 
+                                    <td class="actions-cell">
+                                        <a href="{{ url_for('admin.edit_scheme', scheme_id=scheme.id) }}" class="btn-action btn-edit">
+                                            <i data-lucide="edit" class="icon-sm"></i> Edit
+                                        </a>
+                                        <form method="POST" action="{{ url_for('admin.archive_scheme', scheme_id=scheme.id) }}" class="inline-form">
+                                            <button type="submit" class="btn-action btn-archive" onclick="return confirm('Are you sure you want to change the active status of this scheme?');">
+                                                <i data-lucide="archive" class="icon-sm"></i> Archive
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="empty-table-state">
+                                            <i data-lucide="folder-open"></i>
+                                            <p>No schemes found in the database.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+{% endblock %}

@@ -1,2 +1,18 @@
-__pycache__
+# Python & Virtual Environment
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Environment Variables & App Secrets
 .env
+instance/
+
+# Local User Uploads (Crucial: prevents tracking test images)
+app/static/uploads/*
+!app/static/uploads/.gitkeep
+
+# IDE & OS Trash
+.vscode/
+.DS_Store
+Thumbs.db

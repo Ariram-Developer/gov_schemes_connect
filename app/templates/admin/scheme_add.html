@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i data-lucide="shield-check" class="sidebar-icon"></i>
+            <span>ADMIN MODULE</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="nav-item">
+                <i data-lucide="layout-dashboard"></i> Dashboard
+            </a>
+            <a href="#" class="nav-item">
+                <i data-lucide="users"></i> Manage Users
+            </a>
+            <a href="{{ url_for('admin.manage_schemes') }}" class="nav-item active">
+                <i data-lucide="folder-kanban"></i> Manage Schemes
+            </a>
+
+            <div class="nav-section-title" style="margin-top: 15px;">APPLICATIONS</div>
+            <a href="#" class="nav-item" style="font-size: 13px;">
+                <span class="status-dot" style="background: #94a3b8;"></span> All Applications
+            </a>
+            <a href="#" class="nav-item" style="font-size: 13px;">
+                <span class="status-dot pending-dot"></span> Under Review
+            </a>
+            <a href="#" class="nav-item" style="font-size: 13px;">
+                <span class="status-dot accepted-dot"></span> Approved
+            </a>
+            <a href="#" class="nav-item" style="font-size: 13px;">
+                <span class="status-dot rejected-dot"></span> Rejected
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+                <i data-lucide="log-out"></i> Secure Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-header">
+            <button id="mobile-menu-btn" class="mobile-menu-btn"><i data-lucide="menu"></i></button>
+            <div class="header-title">Create New Government Scheme</div>
+            
+            <div class="header-profile">
+                <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Dark Mode">
+                    <i data-lucide="moon"></i>
+                </button>
+                <div class="profile-text">
+                    <div class="profile-name">Admin Portal</div>
+                    <div class="profile-role">Administrator</div>
+                </div>
+                <div class="avatar">A</div>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+            
+            <div class="flash-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <a href="{{ url_for('admin.manage_schemes') }}" class="back-link">
+                <i data-lucide="arrow-left"></i> Back to Manage Schemes
+            </a>
+
+            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+                <h4 style="color: #d97706; font-weight: 700; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center;">
+                    <i data-lucide="alert-triangle" style="width: 18px; height: 18px; margin-right: 8px;"></i> Admin Safety Guidelines
+                </h4>
+                <ul style="font-size: 13px; color: var(--text-muted); margin-left: 20px; line-height: 1.6;">
+                    <li><strong>Unique Titles:</strong> Do not duplicate existing scheme titles to prevent database conflicts.</li>
+                    <li><strong>Required Documents Formatting (CRITICAL):</strong> You must separate each document strictly with a comma (e.g., <code style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">Aadhaar Card, PAN Card, Bank Passbook</code>). Do not use bullet points or slash marks, as this powers the citizen multi-file upload wizard.</li>
+                </ul>
+            </div>
+
+            <div class="data-card" style="max-width: 800px; padding: 40px; margin: 0 auto;">
+                <form method="POST">
+                    
+                    <div class="form-group">
+                        <label for="title">Scheme Title <span class="required-star">*</span></label>
+                        <input type="text" id="title" name="title" class="form-control" required placeholder="e.g. Pradhan Mantri Mudra Yojana">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category <span class="required-star">*</span></label>
+                        <input type="text" id="category" name="category" class="form-control" required placeholder="e.g. Small Business (or select existing below)" list="category-list">
+                        <datalist id="category-list">
+                            {% for cat in categories %}
+                                <option value="{{ cat }}">
+                            {% endfor %}
+                        </datalist>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description <span class="required-star">*</span></label>
+                        <textarea id="description" name="description" class="form-control" rows="4" required placeholder="Describe the benefits and overview of the scheme..." style="resize: vertical; padding: 12px;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eligibility_criteria">Eligibility Criteria <span class="required-star">*</span></label>
+                        <textarea id="eligibility_criteria" name="eligibility_criteria" class="form-control" rows="3" required placeholder="Specify age, income, or target group..." style="resize: vertical; padding: 12px;"></textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 30px;">
+                        <label for="required_documents">Required Documents (Comma-separated) <span class="required-star">*</span></label>
+                        <input type="text" id="required_documents" name="required_documents" class="form-control" required placeholder="Aadhaar Card, PAN Card, Bank Passbook">
+                    </div>
+
+                    <button type="submit" class="btn-primary-large">
+                        <i data-lucide="plus-circle"></i> Publish Scheme to Portal
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+</div>
+{% endblock %}

@@ -9,7 +9,7 @@
             <span>ADMIN MODULE</span>
         </div>
         <nav class="sidebar-nav">
-            <a href="{{ url_for('admin.dashboard') }}" class="nav-item active">
+            <a href="{{ url_for('admin.dashboard') }}" class="nav-item">
                 <i data-lucide="layout-dashboard"></i> Dashboard
             </a>
             <a href="#" class="nav-item">
@@ -19,17 +19,17 @@
                 <i data-lucide="folder-kanban"></i> Manage Schemes
             </a>
 
-            <div class="nav-section-title">QUICK FILTERS</div>
-            <a href="{{ url_for('admin.dashboard', status='All') }}#recent-table" class="nav-item {% if current_filter == 'All' %}active{% endif %}">
+            <div class="nav-section-title">APPLICATIONS</div>
+            <a href="{{ url_for('admin.manage_applications', status='All') }}" class="nav-item {% if current_filter == 'All' %}active{% endif %}">
                 <span class="status-dot default-dot"></span> All Applications
             </a>
-            <a href="{{ url_for('admin.dashboard', status='Pending') }}#recent-table" class="nav-item {% if current_filter == 'Pending' %}active{% endif %}">
+            <a href="{{ url_for('admin.manage_applications', status='Pending') }}" class="nav-item {% if current_filter == 'Pending' %}active{% endif %}">
                 <span class="status-dot pending-dot"></span> Under Review
             </a>
-            <a href="{{ url_for('admin.dashboard', status='Approved') }}#recent-table" class="nav-item {% if current_filter == 'Approved' or current_filter == 'Accepted' %}active{% endif %}">
+            <a href="{{ url_for('admin.manage_applications', status='Approved') }}" class="nav-item {% if current_filter == 'Approved' %}active{% endif %}">
                 <span class="status-dot accepted-dot"></span> Approved
             </a>
-            <a href="{{ url_for('admin.dashboard', status='Rejected') }}#recent-table" class="nav-item {% if current_filter == 'Rejected' %}active{% endif %}">
+            <a href="{{ url_for('admin.manage_applications', status='Rejected') }}" class="nav-item {% if current_filter == 'Rejected' %}active{% endif %}">
                 <span class="status-dot rejected-dot"></span> Rejected
             </a>
         </nav>
@@ -43,7 +43,7 @@
     <main class="main-content">
         <header class="top-header">
             <button id="mobile-menu-btn" class="mobile-menu-btn"><i data-lucide="menu"></i></button>
-            <div class="header-title">Thunai - Admin Workspace</div>
+            <div class="header-title">Application Processing Center</div>
             
             <div class="header-profile">
                 <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Dark Mode">
@@ -69,45 +69,8 @@
                 {% endwith %}
             </div>
 
-            <img src="{{ url_for('static', filename='images/banner.png') }}" alt="System Overview Banner" class="dashboard-image-banner" onerror="this.style.display='none';">
-
-            <h2 class="page-title">Platform Overview</h2>
-            
-            <div class="metrics-grid">
-                <div class="metric-card blue">
-                    <div class="icon-wrapper"><i data-lucide="users"></i></div>
-                    <div class="metric-value">{{ metrics.total_users }}</div>
-                    <div class="metric-label">Total Users</div>
-                </div>
-                <div class="metric-card blue">
-                    <div class="icon-wrapper"><i data-lucide="file-text"></i></div>
-                    <div class="metric-value">{{ metrics.total_schemes }}</div>
-                    <div class="metric-label">Active Schemes</div>
-                </div>
-                <div class="metric-card amber">
-                    <div class="icon-wrapper"><i data-lucide="clock"></i></div>
-                    <div class="metric-value">{{ metrics.pending_apps }}</div>
-                    <div class="metric-label">Applications Under Review</div>
-                </div>
-                <div class="metric-card green">
-                    <div class="icon-wrapper"><i data-lucide="check-circle"></i></div>
-                    <div class="metric-value">{{ metrics.approved_apps }}</div>
-                    <div class="metric-label">Applications Approved</div>
-                </div>
-                <div class="metric-card red">
-                    <div class="icon-wrapper"><i data-lucide="x-circle"></i></div>
-                    <div class="metric-value">{{ metrics.rejected_apps }}</div>
-                    <div class="metric-label">Applications Rejected</div>
-                </div>
-            </div>
-
-            <div class="flex-row-between dashboard-table-header" id="recent-table">
-                <h2 class="page-title no-margin">
-                    {% if current_filter == 'All' %}Recent Applications Feed{% else %}Recent {{ current_filter }} Applications{% endif %}
-                </h2>
-                {% if current_filter != 'All' %}
-                    <a href="{{ url_for('admin.dashboard') }}#recent-table" class="btn-ghost clear-filter-btn">Clear Filter</a>
-                {% endif %}
+            <div class="flex-row-between">
+                <h2 class="page-title">{{ current_filter }} Applications Queue</h2>
             </div>
 
             <div class="data-card">
@@ -120,7 +83,7 @@
                                 <th>Scheme Name</th>
                                 <th>Submitted On</th>
                                 <th>Status</th>
-                                <th class="table-header-right">Action</th>
+                                <th class="text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -135,7 +98,7 @@
                                         <span class="pill {{ app.status | lower }}">{{ app.status }}</span>
                                     </td>
                                     <td class="actions-cell">
-                                        <a href="{{ url_for('admin.review_application', app_id=app.id, status=current_filter, source='dashboard') }}" class="btn-view">
+                                        <a href="{{ url_for('admin.review_application', app_id=app.id, status=current_filter) }}" class="btn-view">
                                             {% if app.status == 'Pending' %}Review{% else %}View Details{% endif %}
                                         </a>
                                     </td>
@@ -146,7 +109,7 @@
                                     <td colspan="6">
                                         <div class="empty-table-state">
                                             <i data-lucide="inbox"></i>
-                                            <p>No recent {{ current_filter | lower }} applications found.</p>
+                                            <p>No {{ current_filter | lower }} applications discovered in this queue.</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -154,12 +117,6 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-
-            <div class="master-queue-link-wrapper">
-                <a href="{{ url_for('admin.manage_applications', status=current_filter) }}" class="master-queue-link">
-                    Expand to Master Queue View <i data-lucide="arrow-right" class="master-queue-icon"></i>
-                </a>
             </div>
 
         </div>

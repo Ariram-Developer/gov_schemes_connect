@@ -5,7 +5,7 @@
     
     <aside class="sidebar">
         <div class="sidebar-header">
-            <i data-lucide="shield-check" style="width: 24px; height: 24px; color: var(--primary); margin-right: 10px;"></i>
+            <i data-lucide="shield-check" class="sidebar-header-icon"></i>
             <span>THUNAI</span>
         </div>
         
@@ -52,14 +52,14 @@
 
         <div class="dashboard-body">
             
-            <h2 style="margin-bottom: 25px; font-weight: 700;">My Applications</h2>
+            <h2 class="page-title">My Applications</h2>
 
             <div class="data-card">
                 <div class="data-header">
                     <h3>Application History</h3>
                 </div>
                 
-                <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
@@ -75,16 +75,16 @@
                                 {% for app in applications %}
                                 <tr>
                                     <td><strong>APP-{{ app.id }}</strong></td>
-                                    <td style="font-weight: 500;">{{ app.scheme_title }}</td>
+                                    <td class="scheme-title-cell">{{ app.scheme_title }}</td>
                                     <td>
-                                        <span class="scheme-category" style="margin-bottom: 0; padding: 2px 8px; font-size: 10px;">
+                                        <span class="scheme-category category-badge-small">
                                             {{ app.category }}
                                         </span>
                                     </td>
                                     <td>
                                         {% if app.status == 'Pending' %}
                                             <span class="pill pending">Pending</span>
-                                        {% elif app.status == 'Accepted' %}
+                                        {% elif app.status == 'Accepted' or app.status == 'Approved' %}
                                             <span class="pill accepted">Accepted</span>
                                         {% elif app.status == 'Rejected' %}
                                             <span class="pill rejected">Rejected</span>
@@ -93,28 +93,28 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if app.status == 'Rejected' and app.rejection_reason %}
-                                            <span style="color: #ef4444; font-size: 13px; font-weight: 500;">
-                                                <i data-lucide="alert-circle" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i>
-                                                {{ app.rejection_reason }}
+                                        {% if app.status == 'Rejected' and app.admin_remarks %}
+                                            <span class="remarks-text rejected">
+                                                <i data-lucide="alert-circle" class="remarks-icon"></i>
+                                                {{ app.admin_remarks }}
                                             </span>
                                         {% elif app.status == 'Pending' %}
-                                            <span style="color: var(--text-muted); font-size: 13px;">Under Admin Review</span>
-                                        {% elif app.status == 'Accepted' %}
-                                            <span style="color: #10b981; font-size: 13px; font-weight: 500;">
-                                                <i data-lucide="check-circle" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i>
+                                            <span class="remarks-text pending">Under Admin Review</span>
+                                        {% elif app.status == 'Accepted' or app.status == 'Approved' %}
+                                            <span class="remarks-text accepted">
+                                                <i data-lucide="check-circle" class="remarks-icon"></i>
                                                 Approved Successfully
                                             </span>
                                         {% else %}
-                                            <span style="color: var(--text-muted); font-size: 13px;">-</span>
+                                            <span class="remarks-text pending">-</span>
                                         {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}
                             {% else %}
                                 <tr>
-                                    <td colspan="5" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
-                                        <i data-lucide="folder-open" style="width: 32px; height: 32px; opacity: 0.5; margin-bottom: 10px;"></i>
+                                    <td colspan="5" class="empty-state-container">
+                                        <i data-lucide="folder-open" class="empty-state-icon"></i>
                                         <br>
                                         You have not submitted any applications yet.
                                     </td>
@@ -134,16 +134,17 @@
         const menuBtn = document.getElementById('mobile-menu-btn');
         const sidebar = document.querySelector('.sidebar');
 
-        if(menuBtn) {
-            menuBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('open');
+        if(menuBtn && sidebar) {
+            menuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Fixed: toggled mobile-open to connect with stylesheet properties
+                sidebar.classList.toggle('mobile-open');
             });
         }
         
-        // Close sidebar if clicking outside of it on mobile
         document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
-                sidebar.classList.remove('open');
+            if (sidebar.classList.contains('mobile-open') && !sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+                sidebar.classList.remove('mobile-open');
             }
         });
     });

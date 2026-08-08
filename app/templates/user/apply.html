@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i data-lucide="shield-check" class="sidebar-icon"></i>
+            <span>THUNAI</span>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">SERVICES</div>
+            <a href="{{ url_for('user.schemes') }}" class="nav-item active">
+                <i data-lucide="grid"></i> Available Schemes
+            </a>
+            <a href="{{ url_for('user.track') }}" class="nav-item">
+                <i data-lucide="file-text"></i> Track Applications
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+                <i data-lucide="log-out"></i> Secure Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-header">
+            <button id="mobile-menu-btn" class="mobile-menu-btn"><i data-lucide="menu"></i></button>
+            <div class="header-title">Secure Application Wizard</div>
+            
+            <div class="header-profile">
+                <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Dark Mode">
+                    <i data-lucide="moon"></i>
+                </button>
+                <div class="profile-text">
+                    <div class="profile-name">Hello, {{ session.get('full_name').split()[0] if session.get('full_name') else 'Citizen' }}</div>
+                    <div class="profile-role">Citizen Portal</div>
+                </div>
+                <div class="avatar">{{ session.get('full_name')[0] | upper if session.get('full_name') else 'C' }}</div>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+            
+            <div class="flash-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <a href="{{ url_for('user.schemes') }}" class="back-link">
+                <i data-lucide="arrow-left"></i> Back to Schemes
+            </a>
+
+            <!-- The Premium Split Layout -->
+            <div class="apply-premium-container">
+                
+                <!-- Left Pane: Scheme Details -->
+                <div class="scheme-info-pane">
+                    <span class="scheme-category">{{ scheme.category }}</span>
+                    <h2 class="scheme-title-large">{{ scheme.title }}</h2>
+                    
+                    <div class="info-block">
+                        <h4><i data-lucide="info"></i> About the Scheme</h4>
+                        <p>{{ scheme.description }}</p>
+                    </div>
+
+                    <div class="info-block">
+                        <h4><i data-lucide="check-square"></i> Eligibility Criteria</h4>
+                        <p>{{ scheme.eligibility_criteria }}</p>
+                    </div>
+                </div>
+
+                <!-- Right Pane: Dynamic Multi-Document Form -->
+                <div class="scheme-form-pane">
+                    <div class="form-header">
+                        <h3>Required Documents</h3>
+                        <p>Please upload all required files individually. Secure your data.</p>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data">
+                        
+                        <!-- DYNAMIC LOOP: Creates a bespoke drop-zone for every single document! -->
+                        {% for doc in doc_fields %}
+                        <div class="premium-file-upload">
+                            <label class="file-label">{{ doc.name }} <span class="required-star">*</span></label>
+                            
+                            <!-- Interactive Drop Zone -->
+                            <div class="file-drop-area" onclick="document.getElementById('{{ doc.slug }}').click()">
+                                <i data-lucide="upload-cloud" id="icon-{{ doc.slug }}"></i>
+                                <span id="text-{{ doc.slug }}" class="file-msg">Click to browse or drag file here</span>
+                                <span class="file-format-hint">PDF, JPG, or PNG (Max 5MB)</span>
+                                
+                                <!-- Hidden input mapped to the zone -->
+                                <input type="file" id="{{ doc.slug }}" name="{{ doc.slug }}" accept=".pdf,.jpg,.jpeg,.png" required style="display:none;" onchange="updateFileName('{{ doc.slug }}')">
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary-large">
+                                <i data-lucide="lock"></i> Submit Encrypted Application
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Interactive JS to make the file zones beautiful -->
+<script>
+    function updateFileName(slug) {
+        const input = document.getElementById(slug);
+        const textDisplay = document.getElementById('text-' + slug);
+        const iconDisplay = document.getElementById('icon-' + slug);
+        const dropArea = input.parentElement;
+
+        if (input.files && input.files.length > 0) {
+            textDisplay.innerText = input.files[0].name;
+            textDisplay.classList.add('has-file');
+            dropArea.classList.add('active');
+            
+            // Swap icon to a green checkmark
+            iconDisplay.setAttribute('data-lucide', 'check-circle');
+            iconDisplay.style.color = '#10b981'; 
+            lucide.createIcons();
+        }
+    }
+</script>
+{% endblock %}

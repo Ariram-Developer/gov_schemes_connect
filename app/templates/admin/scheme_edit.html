@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        </aside>
+
+    <main class="main-content">
+        <header class="top-header">
+            <div class="header-title">Edit Government Scheme: #{{ scheme.id }}</div>
+        </header>
+
+        <div class="dashboard-body">
+            
+            <div class="flash-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <a href="{{ url_for('admin.manage_schemes') }}" class="back-link">
+                <i data-lucide="arrow-left"></i> Back to Manage Schemes
+            </a>
+
+            <div class="data-card admin-data-card" style="max-width: 800px; padding: 40px; margin: 0 auto;">
+                <form method="POST">
+                    
+                    <div class="form-group">
+                        <label for="title">Scheme Title <span class="required-star">*</span></label>
+                        <input type="text" id="title" name="title" class="form-control" required value="{{ scheme.title }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category <span class="required-star">*</span></label>
+                        <input type="text" id="category" name="category" class="form-control" required value="{{ scheme.category }}" list="category-list">
+                        <datalist id="category-list">
+                            {% for cat in categories %}
+                                <option value="{{ cat }}">
+                            {% endfor %}
+                        </datalist>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description <span class="required-star">*</span></label>
+                        <textarea id="description" name="description" class="form-control" rows="4" required style="resize: vertical; padding: 12px;">{{ scheme.description }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eligibility_criteria">Eligibility Criteria <span class="required-star">*</span></label>
+                        <textarea id="eligibility_criteria" name="eligibility_criteria" class="form-control" rows="3" required style="resize: vertical; padding: 12px;">{{ scheme.eligibility_criteria }}</textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 30px;">
+                        <label for="required_documents">Required Documents (Comma-separated) <span class="required-star">*</span></label>
+                        <input type="text" id="required_documents" name="required_documents" class="form-control" required value="{{ scheme.required_documents }}">
+                    </div>
+
+                    <button type="submit" class="btn-primary-large">
+                        <i data-lucide="save"></i> Save Changes to Scheme
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+</div>
+{% endblock %}

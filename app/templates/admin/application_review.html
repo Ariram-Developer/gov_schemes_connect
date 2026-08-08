@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        </aside>
+
+    <main class="main-content">
+        <header class="top-header">
+            <div class="header-title">Application Review: APP-{{ application.id }}</div>
+        </header>
+
+        <div class="dashboard-body">
+            
+            {% if source == 'dashboard' %}
+                <a href="{{ url_for('admin.dashboard', status=return_status) }}#recent-table" class="back-link">
+                    <i data-lucide="arrow-left"></i> Back to Dashboard Activity
+                </a>
+            {% else %}
+                <a href="{{ url_for('admin.manage_applications', status=return_status) }}" class="back-link">
+                    <i data-lucide="arrow-left"></i> Back to Master Queue
+                </a>
+            {% endif %}
+
+            <div class="review-pane">
+                <h3 class="pane-title-elite">
+                    <i data-lucide="user-check" class="brand-icon"></i> Identity Verification
+                </h3>
+                
+                <div class="applicant-meta-block">
+                    <div class="meta-label">Full Legal Name</div>
+                    <div class="meta-value text-xl font-bold">{{ application.full_name }}</div>
+                </div>
+                
+                <div class="applicant-meta-block">
+                    <div class="meta-label">Contact Intelligence</div>
+                    <div class="meta-value">{{ application.email }}</div>
+                </div>
+
+                <div class="applicant-meta-block border-none no-padding">
+                    <div class="meta-label">Requested Scheme</div>
+                    <div class="meta-value text-primary-accent">{{ application.title }}</div>
+                    <span class="pill-small inline-badge">{{ application.category }}</span>
+                </div>
+            </div>
+
+                <div class="review-pane">
+                    <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        <i data-lucide="lock" style="color: #10b981;"></i> Secure Document Vault
+                    </h3>
+                    
+                    <div class="document-vault">
+                        {% if documents %}
+                            {% for doc in documents %}
+                                <button type="button" class="doc-file-btn view-doc-btn" data-file-url="{{ doc }}">
+                                    <div class="flex-align-gap">
+                                        <i data-lucide="file-text"></i>
+                                        {{ doc }}
+                                    </div>
+                                    <i data-lucide="eye" class="icon-sm text-muted"></i>
+                                </button>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div style="border-top: 1px solid rgba(255,255,255,0.05); margin: 30px 0;"></div>
+
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 15px;">Official Determination</h3>
+                    
+                    <form method="POST">
+                        <div class="form-group">
+                            <label for="remarks" style="color: var(--text-muted);">Administrator Remarks (Visible to Citizen)</label>
+                            <textarea id="remarks" name="remarks" class="form-control" rows="3" placeholder="State reasons for approval or rejection here..." {% if application.status != 'Pending' %}readonly{% endif %}>{{ application.admin_remarks or '' }}</textarea>
+                        </div>
+                        
+                        {% if application.status == 'Pending' %}
+                            <div class="decision-actions">
+                                <button type="submit" name="action" value="Reject" class="btn-elite btn-elite-reject" onclick="return confirm('WARNING: You are about to officially REJECT this application. Proceed?');">
+                                    <i data-lucide="x-circle"></i> Reject Application
+                                </button>
+                                <button type="submit" name="action" value="Approve" class="btn-elite btn-elite-approve" onclick="return confirm('You are about to officially APPROVE this application. Proceed?');">
+                                    <i data-lucide="check-circle"></i> Approve Application
+                                </button>
+                            </div>
+                        {% else %}
+                            <div style="padding: 15px; background: rgba(255,255,255,0.02); border-radius: 8px; text-align: center; border: 1px dashed rgba(255,255,255,0.1);">
+                                <span style="font-size: 14px; font-weight: 600; color: var(--text-muted);">
+                                    This application has already been processed and is marked as <strong class="{{ application.status | lower }}" style="text-transform: uppercase;">{{ application.status }}</strong>.
+                                </span>
+                            </div>
+                        {% endif %}
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<div id="document-lightbox" class="lightbox-overlay hidden-element">
+    <div class="lightbox-container">
+        <div class="lightbox-header">
+            <h4 id="lightbox-title" class="lightbox-title">Document View</h4>
+            <button type="button" id="lightbox-close" class="lightbox-close-btn">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="lightbox-body">
+            <div id="lightbox-content" style="width: 100%; text-align: center;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const viewButtons = document.querySelectorAll('.view-doc-btn');
+    const lightbox = document.getElementById('document-lightbox');
+    const lightboxClose = document.getElementById('lightbox-close');
+    const lightboxContent = document.getElementById('lightbox-content');
+    const lightboxTitle = document.getElementById('lightbox-title');
+
+    viewButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault(); 
+            
+            const fileUrl = this.getAttribute('data-file-url');
+            
+            // Clean up the title by grabbing only the actual file name at the end of the path
+            const cleanFileName = fileUrl.split('/').pop();
+            lightboxTitle.textContent = cleanFileName;
+            
+            // Check file extension
+            const ext = cleanFileName.split('.').pop().toLowerCase();
+            
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+                lightboxContent.innerHTML = `<img src="${fileUrl}" class="lightbox-content-element" alt="${cleanFileName}">`;
+            } else {
+                lightboxContent.innerHTML = `<iframe src="${fileUrl}" class="lightbox-iframe" title="${cleanFileName}"></iframe>`;
+            }
+            
+            if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+            
+            // Trigger Animation
+            lightbox.classList.remove('hidden-element');
+            setTimeout(() => {
+                lightbox.classList.add('active');
+            }, 10); 
+        });
+    });
+
+    const closeLightbox = () => {
+        lightbox.classList.remove('active');
+        setTimeout(() => {
+            lightbox.classList.add('hidden-element');
+            lightboxContent.innerHTML = ''; 
+        }, 300); 
+    };
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    
+    lightbox.addEventListener('click', function(e) {
+        if (e.target === lightbox) {
+            closeLightbox();
+        }
+    });
+});
+</script>
+{% endblock %}
+
