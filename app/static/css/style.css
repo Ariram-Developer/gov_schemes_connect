@@ -1972,6 +1972,126 @@ td.actions-cell {
 }
 
 /* =========================================
+   Premium Profile Card UI
+========================================= */
+.profile-card-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 40px;
+}
+
+.profile-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 700px;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.profile-card-header {
+    background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%);
+    padding: 40px 30px;
+    text-align: center;
+    position: relative;
+}
+
+.avatar-large {
+    width: 90px;
+    height: 90px;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 auto 15px auto;
+}
+
+.profile-card-header h2 {
+    color: #fff;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.profile-card-header p {
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+}
+
+.profile-card-body {
+    padding: 40px 30px;
+}
+
+.profile-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.profile-input-group {
+    position: relative;
+}
+
+.profile-input-icon {
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    width: 18px;
+    color: var(--text-muted);
+}
+
+.profile-input-with-icon {
+    padding: 14px 14px 14px 40px !important;
+}
+
+.profile-form-actions {
+    margin-top: 35px;
+    border-top: 1px solid var(--border);
+    padding-top: 25px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-save-profile {
+    padding: 12px 30px;
+    font-size: 14px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Navbar Link Styling */
+.top-nav-profile-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s ease;
+}
+
+.top-nav-profile-link:hover {
+    opacity: 0.8;
+}
+
+.sidebar.mobile-open {
+    transform: translateX(0) !important;
+    box-shadow: 15px 0 30px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* =========================================
    Responsive Media Queries & Mobile Fluidity
 ========================================= */
 @media (max-width: 1024px) {

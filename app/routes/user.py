@@ -1,6 +1,7 @@
 import os
 import re
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
+import mysql
 from werkzeug.utils import secure_filename
 from app.db import get_db
 from app.utils import login_required

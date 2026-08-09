@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i data-lucide="shield-check" class="sidebar-icon"></i>
+            <span>{{ 'ADMIN MODULE' if user.role == 'admin' else 'CITIZEN PORTAL' }}</span>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">NAVIGATION</div>
+            
+            {% if user.role == 'admin' %}
+                <a href="{{ url_for('admin.dashboard') }}" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i> Dashboard
+                </a>
+                <a href="{{ url_for('admin.manage_users') }}" class="nav-item">
+                    <i data-lucide="users"></i> Manage Users
+                </a>
+                <a href="{{ url_for('admin.manage_schemes') }}" class="nav-item">
+                    <i data-lucide="folder-kanban"></i> Manage Schemes
+                </a>
+            {% else %}
+                <a href="{{ url_for('user.schemes') }}" class="nav-item">
+                    <i data-lucide="grid"></i> Available Schemes
+                </a>
+                <a href="{{ url_for('user.track') }}" class="nav-item">
+                    <i data-lucide="file-text"></i> Track Applications
+                </a>
+            {% endif %}
+
+            <div class="nav-section-title top-spacer">ACCOUNT</div>
+            <a href="{{ url_for('profile') }}" class="nav-item active">
+                <i data-lucide="user"></i> My Profile
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+                <i data-lucide="log-out"></i> Secure Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        
+        <header class="top-header">
+            <button id="mobile-menu-btn" class="mobile-menu-btn">
+                <i data-lucide="menu"></i>
+            </button>
+            
+            <h1 class="header-title">Account Settings</h1>
+            
+            <div class="header-profile">
+                <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
+                    <i data-lucide="moon"></i>
+                </button>
+                
+                <a href="{{ url_for('profile') }}" class="top-nav-profile-link">
+                    <div class="profile-text">
+                        <div class="profile-name">{{ user.full_name }}</div>
+                        <div class="profile-role" style="text-transform: capitalize;">{{ user.role }}</div>
+                    </div>
+                    <div class="avatar">
+                        {{ user.full_name[:2] | upper }}
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <div class="dashboard-body profile-card-container">
+            <div class="profile-card">
+                
+                <div class="profile-card-header">
+                    <div class="avatar-large">
+                        {{ user.full_name[:2] | upper }}
+                    </div>
+                    <h2>{{ user.full_name }}</h2>
+                    <p>Member since {{ user.created_at.strftime('%B %Y') if user.created_at else '2026' }}</p>
+                </div>
+
+                <div class="profile-card-body">
+                    
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            <div class="flash-container">
+                                {% for category, message in messages %}
+                                    <div class="flash {{ category }}">
+                                        <i data-lucide="{{ 'check-circle' if category == 'success' else 'alert-circle' }}"></i>
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('profile') }}"> 
+                        
+                        <div class="profile-form-grid">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" name="full_name" class="form-control" value="{{ user.full_name }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="text" name="phone_number" class="form-control" value="{{ user.phone_number or '' }}" placeholder="+91 XXXXX XXXXX">
+                            </div>
+
+                            <div class="form-group">
+                                <label>System Username</label>
+                                <div class="profile-input-group">
+                                    <i data-lucide="at-sign" class="profile-input-icon"></i>
+                                    <input type="text" name="username" class="form-control profile-input-with-icon" value="{{ user.username }}" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Secure Email</label>
+                                <div class="profile-input-group">
+                                    <i data-lucide="mail" class="profile-input-icon"></i>
+                                    <input type="email" name="email" class="form-control profile-input-with-icon" value="{{ user.email }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-form-actions">
+                            <button type="submit" class="btn-primary btn-save-profile">
+                                <i data-lucide="save"></i>
+                                Save Profile Vault
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+{% endblock %}

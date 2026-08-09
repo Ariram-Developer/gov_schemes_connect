@@ -19,6 +19,10 @@
                 <i data-lucide="file-text"></i>
                 Track Applications
             </a>
+            <div class="nav-section-title top-spacer">ACCOUNT</div>
+            <a href="{{ url_for('profile') }}" class="nav-item">
+                <i data-lucide="user"></i> My Profile
+            </a>
         </nav>
         
         <div class="sidebar-footer">
@@ -42,11 +46,15 @@
                     <i data-lucide="moon"></i>
                 </button>
                 
-                <div class="profile-text">
-                    <div class="profile-name">Hello, {{ session.get('full_name').split()[0] }}</div>
-                    <div class="profile-role">Citizen</div>
-                </div>
-                <div class="avatar">{{ session.get('full_name')[0] | upper }}</div>
+                <a href="{{ url_for('profile') }}" class="top-nav-profile-link">
+                    <div class="profile-text">
+                        <div class="profile-name">{{ session.get('full_name', 'User') }}</div>
+                        <div class="profile-role" style="text-transform: capitalize;">{{ session.get('role', 'Citizen') }}</div>
+                    </div>
+                    <div class="avatar">
+                        {{ session.get('full_name', 'US')[:2] | upper }}
+                    </div>
+                </a>
             </div>
         </header>
 

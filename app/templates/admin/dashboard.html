@@ -32,6 +32,10 @@
             <a href="{{ url_for('admin.dashboard', status='Rejected') }}#recent-table" class="nav-item small-font">
                 <span class="status-dot rejected-dot"></span> Rejected
             </a>
+            <div class="nav-section-title top-spacer">ACCOUNT</div>
+            <a href="{{ url_for('profile') }}" class="nav-item">
+                <i data-lucide="user"></i> My Profile
+        </a>
         </nav>
         <div class="sidebar-footer">
             <a href="{{ url_for('auth.logout') }}" class="logout-btn">
@@ -49,11 +53,16 @@
                 <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Dark Mode">
                     <i data-lucide="moon"></i>
                 </button>
-                <div class="profile-text">
-                    <div class="profile-name">Admin Portal</div>
-                    <div class="profile-role">Administrator</div>
-                </div>
-                <div class="avatar">A</div>
+                
+                <a href="{{ url_for('profile') }}" class="top-nav-profile-link">
+                    <div class="profile-text">
+                        <div class="profile-name">{{ session.get('full_name', 'User') }}</div>
+                        <div class="profile-role" style="text-transform: capitalize;">{{ session.get('role', 'Citizen') }}</div>
+                    </div>
+                    <div class="avatar">
+                        {{ session.get('full_name', 'US')[:2] | upper }}
+                    </div>
+                </a>
             </div>
         </header>
 
