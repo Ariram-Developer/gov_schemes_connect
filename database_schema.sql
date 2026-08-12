@@ -1,6 +1,3 @@
-CREATE DATABASE IF NOT EXISTS gov_scheme_connect;
-USE gov_scheme_connect;
-
 DROP TABLE IF EXISTS applications;
 DROP TABLE IF EXISTS schemes;
 DROP TABLE IF EXISTS users;

@@ -79,4 +79,10 @@ def create_app():
         
         return render_template('profile.html', user=user_data)
 
+    @app.errorhandler(Exception)
+    if not app.debug:
+        def handle_exception(e):
+            import traceback
+            return f"<h1>CRITICAL ERROR:</h1><pre>{traceback.format_exc()}</pre>", 500
+
     return app
