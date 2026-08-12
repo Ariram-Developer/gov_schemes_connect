@@ -1,12 +1,23 @@
 import os
 import re
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
-import mysql
+import mysql.connector
 from werkzeug.utils import secure_filename
 from app.db import get_db
 from app.utils import login_required
 
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
 user_bp = Blueprint('user', __name__, url_prefix='/user')
+
+cloudinary.config( 
+  cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'), 
+  api_key = os.environ.get('CLOUDINARY_API_KEY'), 
+  api_secret = os.environ.get('CLOUDINARY_API_SECRET'),
+  secure = True
+)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'pdf', 'png', 'jpg', 'jpeg'}
@@ -27,7 +38,6 @@ def apply(scheme_id):
     db = get_db()
     cursor = db.cursor(dictionary=True)
     
-    # 1. Fetch the specific scheme details
     cursor.execute("SELECT * FROM schemes WHERE id = %s", (scheme_id,))
     scheme = cursor.fetchone()
     
@@ -36,19 +46,15 @@ def apply(scheme_id):
         cursor.close()
         return redirect(url_for('user.schemes'))
         
-    # 2. Dynamically build a list of required documents with clean ID "slugs" for HTML inputs
     required_docs_raw = [doc.strip() for doc in scheme['required_documents'].split(',')]
     doc_fields = []
     for doc in required_docs_raw:
-        # Converts "Aadhaar Card" into "aadhaar_card"
         slug = re.sub(r'[^a-zA-Z0-9]', '_', doc.lower())
         doc_fields.append({'name': doc, 'slug': slug})
 
-    # 3. Handle the Submission
     if request.method == 'POST':
         uploaded_paths = []
         
-        # STRICT VALIDATION: Check every dynamically generated field
         for doc_obj in doc_fields:
             slug = doc_obj['slug']
             doc_name = doc_obj['name']
@@ -66,15 +72,19 @@ def apply(scheme_id):
                 flash(f'Validation Error: Invalid file format for {doc_name}. Use PDF, JPG, or PNG.', 'error')
                 return redirect(request.url)
 
-            # Securely save each verified file
-            ext = file.filename.rsplit('.', 1)[1].lower()
-            filename = secure_filename(f"u{session['user_id']}_s{scheme_id}_{slug[:15]}.{ext}")
-            file_path = os.path.join(current_app.root_path, 'static', 'uploads', filename)
-            file.save(file_path)
-            
-            uploaded_paths.append(f"/static/uploads/{filename}")
+            try:
+                upload_result = cloudinary.uploader.upload(
+                    file, 
+                    folder=f"thunai_documents/user_{session['user_id']}/scheme_{scheme_id}"
+                )
+                
+                secure_url = upload_result.get('secure_url')
+                uploaded_paths.append(secure_url)
+                
+            except Exception as e:
+                flash(f'Server Error: Failed to securely vault {doc_name}. Please try again.', 'error')
+                return redirect(request.url)
         
-        # Combine all safe file paths into a single comma-separated string
         all_documents_str = ",".join(uploaded_paths)
         
         try:
@@ -83,7 +93,7 @@ def apply(scheme_id):
                 (session['user_id'], scheme_id, all_documents_str)
             )
             db.commit()
-            flash('Application submitted successfully! All documents securely uploaded.', 'success')
+            flash('Application submitted successfully! All documents securely vaulted.', 'success')
         except mysql.connector.IntegrityError:
             flash('You have already applied for this scheme.', 'error')
         finally:
