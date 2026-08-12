@@ -4,10 +4,14 @@ from mysql.connector import pooling
 from flask import current_app, g
 
 def get_pool():
-    """Initializes the MySQL connection pool using Flask app config."""
+    """Initializes the MySQL connection pool safely for Railway or Local."""
     if 'db_pool' not in current_app.config:
-        # Explicitly force port to be an integer
-        port_val = current_app.config.get('DB_PORT', 3306)
+        host = os.environ.get('MYSQLHOST') or current_app.config.get('DB_HOST', 'localhost')
+        user = os.environ.get('MYSQLUSER') or current_app.config.get('DB_USER', 'root')
+        password = os.environ.get('MYSQLPASSWORD') or current_app.config.get('DB_PASSWORD', '')
+        database = os.environ.get('MYSQLDATABASE') or current_app.config.get('DB_NAME', 'gov_scheme_connect')
+        
+        port_val = os.environ.get('MYSQLPORT') or current_app.config.get('DB_PORT', 3306)
         try:
             port_val = int(port_val)
         except (ValueError, TypeError):
@@ -17,10 +21,10 @@ def get_pool():
             pool_name="gov_pool",
             pool_size=5,
             pool_reset_session=True,
-            host=current_app.config['DB_HOST'],
-            user=current_app.config['DB_USER'],
-            password=current_app.config['DB_PASSWORD'],
-            database=current_app.config['DB_NAME'],
+            host=host,
+            user=user,
+            password=password,
+            database=database,
             port=port_val
         )
     return current_app.config['db_pool']
