@@ -1,3 +1,4 @@
+import os
 import mysql.connector
 from mysql.connector import pooling
 from flask import current_app, g
@@ -9,10 +10,10 @@ def get_pool():
             pool_name="gov_pool",
             pool_size=5,
             pool_reset_session=True,
-            host=current_app.config['DB_HOST'],
-            user=current_app.config['DB_USER'],
-            password=current_app.config['DB_PASSWORD'],
-            database=current_app.config['DB_NAME']
+            host=os.environ.get('DB_HOST', 'localhost'),
+            user=os.environ.get('DB_USER', 'root'),
+            password=os.environ.get('DB_PASSWORD', ''),
+            database=os.environ.get('DB_NAME', 'gov_scheme_connect')
         )
     return current_app.config['db_pool']
 

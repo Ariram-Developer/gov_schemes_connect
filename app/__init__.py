@@ -1,5 +1,6 @@
+import os
 from flask import Flask, flash, redirect, request, url_for, render_template, session
-import mysql
+import mysql.connector
 from config import Config
 from app import db
 
@@ -41,7 +42,13 @@ def create_app():
             
         user_id = session['user_id']
         
-        conn = mysql.connector.connect(host='localhost', user='root', password='', database='gov_scheme_connect')
+        # Now securely reading from your .env file
+        conn = mysql.connector.connect(
+            host=os.environ.get('DB_HOST', 'localhost'),
+            user=os.environ.get('DB_USER', 'root'),
+            password=os.environ.get('DB_PASSWORD', ''),
+            database=os.environ.get('DB_NAME', 'gov_scheme_connect')
+        )
         cursor = conn.cursor(dictionary=True)
         
         if request.method == 'POST':
